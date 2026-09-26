@@ -122,14 +122,16 @@
                             </svg>
                             Download File
                         </a>
-                    {% elif resource.external_url %}
+                    {% endif %}
+                    {% if resource.external_url %}
                         <a href="{% url 'resources:download_resource' resource.pk %}?action=external" class="btn btn-primary btn-lg px-4" target="_blank" rel="noopener">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem; vertical-align: -2px;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                             </svg>
                             Open External Link
                         </a>
-                    {% else %}
+                    {% endif %}
+                    {% if not resource.file and not resource.external_url %}
                         <div class="alert alert-danger mb-0 d-flex align-items-center">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2" style="flex-shrink: 0;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
