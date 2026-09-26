@@ -1,0 +1,50 @@
+{% load resource_filters %}
+<div class="row g-4">
+    {% for res in resources %}
+    <div class="col-md-6">
+        <div class="card resource-card h-100">
+            <div class="card-body">
+                <span class="badge bg-{{ res.resource_type|slugify }} mb-2">{{ res.resource_type }}</span>
+                <h5 class="card-title">{{ res.title }}</h5>
+                <div class="resource-meta">
+                    <span>{{ res.subject }}</span>
+                    <span>Sem {{ res.semester }}</span>
+                </div>
+                <p class="card-text">{{ res.description|truncatechars:100 }}</p>
+                {% if res.tags %}
+                <div class="detail-tags">
+                    {% for tag in res.tags|split:"," %}
+                        <span class="badge bg-warning text-dark">{{ tag|trim }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="resource-footer">
+                <small class="text-muted">{{ res.created_at|date:"M d, Y" }}</small>
+                <div class="d-flex gap-2 align-items-center">
+                    <form action="{% url 'resources:upvote_resource' res.pk %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-upvote" title="Upvote" hx-post="{% url 'resources:upvote_resource' res.pk %}" hx-target="closest .btn-upvote" hx-swap="outerHTML">
+                            👍 {{ res.upvotes }}
+                        </button>
+                    </form>
+                    <a href="{% url 'resources:resource_detail' res.pk %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="empty-state">
+            <div class="icon">
+                <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <h4>No resources found</h4>
+            <p class="mb-3">No resources matched your search criteria.</p>
+            <a href="{% url 'resources:resource_list' %}" class="btn btn-outline-primary">Clear Filters</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>

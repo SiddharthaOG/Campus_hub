@@ -1,0 +1,4 @@
+{% csrf_token %}
+<button type="submit" class="btn btn-upvote upvoted" title="Upvoted" hx-post="{% url 'resources:upvote_resource' resource.pk %}" hx-target="closest .btn-upvote" hx-swap="outerHTML">
+    👍 {{ resource.upvotes }}
+</button>

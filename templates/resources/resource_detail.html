@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load resource_filters %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body p-4 p-md-5">
+                <div class="detail-header">
+                    <span class="badge bg-{{ resource.resource_type|slugify }} mb-3">{{ resource.resource_type }}</span>
+                    <h1 class="detail-title">{{ resource.title }}</h1>
+
+                    <div class="detail-meta">
+                        <div>
+                            <strong>Subject:</strong> {{ resource.subject }}
+                        </div>
+                        <div>
+                            <strong>Semester:</strong> {{ resource.semester }}
+                        </div>
+                        <div>
+                            <strong>Uploaded:</strong> {{ resource.created_at|date:"F j, Y" }}
+                        </div>
+                        <div>
+                            <strong>Downloads:</strong> {{ resource.download_count }}
+                        </div>
+                        <div>
+                            <strong>Upvotes:</strong> {{ resource.upvotes }}
+                        </div>
+                        {% if resource.uploaded_by %}
+                        <div>
+                            <strong>Uploaded by:</strong> {{ resource.uploaded_by.username }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="fw-semibold mb-3">Description</h5>
+                    <div class="detail-description">{{ resource.description|linebreaksbr }}</div>
+                </div>
+
+                {% if resource.tags %}
+                <div class="mb-4">
+                    <h6 class="fw-semibold mb-2">Tags</h6>
+                    <div class="detail-tags">
+                        {% for tag in resource.tags|split:"," %}
+                            <span class="badge bg-warning text-dark">{{ tag|trim }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- File Preview Section -->
+                {% if resource.file %}
+                <div class="mb-4">
+                    <h5 class="fw-semibold mb-3">Preview</h5>
+                    {% with file_url=resource.file.url file_name=resource.file.name %}
+                        {% if file_name|lower|endswith:".jpg" or file_name|lower|endswith:".jpeg" or file_name|lower|endswith:".png" or file_name|lower|endswith:".gif" or file_name|lower|endswith:".webp" %}
+                            <div class="text-center mb-3">
+                                <img src="{{ file_url }}" alt="{{ file_name }}" class="img-fluid rounded shadow-sm" style="max-height: 500px;">
+                            </div>
+                        {% elif file_name|lower|endswith:".pdf" %}
+                            <div class="ratio ratio-16x9 rounded overflow-hidden border">
+                                <iframe src="{{ file_url }}" class="border-0" title="{{ file_name }}"></iframe>
+                            </div>
+                            <div class="text-center mt-2">
+                                <small class="text-muted">If the PDF doesn't display, <a href="{{ file_url }}" target="_blank">open in new tab</a></small>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2" style="vertical-align: -2px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Preview not available for this file type. <a href="{{ file_url }}" class="alert-link">Download to view</a>.
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                {% endif %}
+
+                <hr class="my-4">
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <form action="{% url 'resources:upvote_resource' resource.pk %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-upvote btn-lg px-4" title="Upvote" hx-post="{% url 'resources:upvote_resource' resource.pk %}" hx-target="closest .btn-upvote" hx-swap="outerHTML">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem; vertical-align: -2px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10l-2 2m0 0l2 2m-2-2v10"/>
+                            </svg>
+                            Upvote ({{ resource.upvotes }})
+                        </button>
+                    </form>
+                    {% if resource.file %}
+                        <a href="{% url 'resources:download_resource' resource.pk %}" class="btn btn-success btn-lg px-4">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem; vertical-align: -2px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Download File
+                        </a>
+                    {% endif %}
+                    {% if resource.external_url %}
+                        <a href="{% url 'resources:download_resource' resource.pk %}?action=external" class="btn btn-primary btn-lg px-4" target="_blank" rel="noopener">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem; vertical-align: -2px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                            Open External Link
+                        </a>
+                    {% endif %}
+                    {% if not resource.file and not resource.external_url %}
+                        <div class="alert alert-danger mb-0 d-flex align-items-center">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2" style="flex-shrink: 0;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            No file or link attached to this resource.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'resources:resource_list' %}" class="btn btn-link ps-0">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.375rem; vertical-align: -2px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Back to Library
+            </a>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="mt-5">
+            <hr class="my-4">
+            <h4 class="fw-semibold mb-4">Comments ({{ comments.count }})</h4>
+            
+            {% if comments %}
+            <div class="mb-4">
+                {% for comment in comments %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <strong class="text-primary">{{ comment.author_name }}</strong>
+                            <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+                        </div>
+                        <p class="mb-0">{{ comment.body|linebreaksbr }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No comments yet. Be the first to comment!</p>
+            {% endif %}
+
+            <!-- Add Comment Form -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Add a Comment</h5>
+                    <form method="POST" action="{% url 'resources:add_comment' resource.pk %}">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            {% if user.is_authenticated %}
+                                <div class="col-12">
+                                    <label class="form-label">Commenting as</label>
+                                    <div class="form-control-plaintext fw-semibold text-primary">
+                                        {{ user.username }}
+                                    </div>
+                                    {{ comment_form.author_name }}
+                                </div>
+                            {% else %}
+                                <div class="col-md-4">
+                                    <label for="{{ comment_form.author_name.id_for_label }}" class="form-label">Name <span class="text-danger">*</span></label>
+                                    {{ comment_form.author_name }}
+                                    {% if comment_form.author_name.errors %}
+                                    <div class="text-danger small">{{ comment_form.author_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            <div class="col-md-8">
+                                <label for="{{ comment_form.body.id_for_label }}" class="form-label">Comment <span class="text-danger">*</span></label>
+                                {{ comment_form.body }}
+                                {% if comment_form.body.errors %}
+                                <div class="text-danger small">{{ comment_form.body.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

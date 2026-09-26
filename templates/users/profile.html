@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load resource_filters %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <!-- Profile Card -->
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <!-- Avatar -->
+                <div class="mb-3">
+                    <div class="avatar-placeholder rounded-circle d-inline-flex align-items-center justify-content-center bg-primary text-white" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                        {{ profile_user.username|first|upper }}
+                    </div>
+                </div>
+                
+                <h3 class="mb-1">{{ profile_user.username }}</h3>
+                
+                {% if profile.branch %}
+                <span class="badge bg-secondary mb-2">{{ profile.get_branch_display }}</span>
+                {% endif %}
+                
+                {% if profile.year %}
+                <div class="text-muted small mb-2">Year {{ profile.year }}</div>
+                {% endif %}
+                
+                {% if profile.is_hosteller %}
+                <span class="badge bg-info mb-2">Hosteller</span>
+                {% endif %}
+                
+                <hr class="my-3">
+                
+                <!-- Stats -->
+                <div class="row text-center mb-3">
+                    <div class="col-4">
+                        <div class="fw-bold text-primary">{{ profile.career_upvotes }}</div>
+                        <div class="small text-muted">Career Upvotes</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-primary">{{ followers_count }}</div>
+                        <div class="small text-muted">Followers</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-primary">{{ following_count }}</div>
+                        <div class="small text-muted">Following</div>
+                    </div>
+                </div>
+                
+                <!-- Follow/Unfollow Button -->
+                {% if request.user.is_authenticated and request.user != profile_user %}
+                <form action="{% url 'users:follow' profile_user.username %}" method="POST" class="mt-2">
+                    {% csrf_token %}
+                    {% if is_following %}
+                        <button type="submit" class="btn btn-outline-danger w-100">Unfollow</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary w-100">Follow</button>
+                    {% endif %}
+                </form>
+                {% elif not request.user.is_authenticated %}
+                <div class="mt-2 text-muted small">
+                    <a href="{% url 'resources:login' %}?next={{ request.path }}">Login</a> to follow
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if profile.bio or profile.phone %}
+            <div class="card-footer bg-transparent border-0 pt-0">
+                {% if profile.bio %}
+                <p class="small mb-1"><strong>Bio:</strong> {{ profile.bio|truncatechars:100 }}</p>
+                {% endif %}
+                {% if profile.phone %}
+                <p class="small mb-0"><strong>Phone:</strong> {{ profile.phone }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <!-- Mutual Followers -->
+        {% if mutual_followers %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Mutual Followers</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    {% for user in mutual_followers %}
+                    <a href="{% url 'users:profile' user.username %}" class="btn btn-sm btn-outline-primary">
+                        {{ user.username }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Resources -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">Resources ({{ user_resources.count }})</h4>
+        </div>
+        
+        {% if user_resources %}
+        <div class="row g-4">
+            {% for res in user_resources %}
+            <div class="col-md-6">
+                <div class="card resource-card h-100">
+                    <div class="card-body">
+                        <span class="badge bg-{{ res.resource_type|slugify }} mb-2">{{ res.resource_type }}</span>
+                        <h5 class="card-title">{{ res.title }}</h5>
+                        <div class="resource-meta">
+                            <span>{{ res.subject }}</span>
+                            <span>Sem {{ res.semester }}</span>
+                        </div>
+                        <p class="card-text">{{ res.description|truncatechars:100 }}</p>
+                        {% if res.tags %}
+                        <div class="detail-tags">
+                            {% for tag in res.tags|split:"," %}
+                                <span class="badge bg-warning text-dark">{{ tag|trim }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="resource-footer">
+                        <small class="text-muted">{{ res.created_at|date:"M d, Y" }}</small>
+                        <div class="d-flex gap-2 align-items-center">
+                            <form action="{% url 'resources:upvote_resource' res.pk %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-upvote" title="Upvote">
+                                    👍 {{ res.upvotes }}
+                                </button>
+                            </form>
+                            <a href="{% url 'resources:resource_detail' res.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <p class="text-muted mb-0">No resources uploaded yet.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

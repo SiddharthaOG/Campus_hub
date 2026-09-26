@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Edit Profile</h4>
+                <a href="{% url 'users:profile' request.user.username %}" class="btn btn-sm btn-outline-secondary">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-1">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Cancel
+                </a>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger mb-4">
+                        {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Bio -->
+                    <div class="mb-4">
+                        <label class="form-label" for="{{ form.bio.id_for_label }}">Bio</label>
+                        {{ form.bio }}
+                        {% if form.bio.errors %}
+                        <div class="invalid-feedback d-block">{{ form.bio.errors|join:", " }}</div>
+                        {% endif %}
+                        <small class="text-muted">Tell others about yourself, your interests, or your study goals.</small>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Branch & Year Row -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label" for="{{ form.branch.id_for_label }}">Branch</label>
+                            {{ form.branch }}
+                            {% if form.branch.errors %}
+                            <div class="invalid-feedback d-block">{{ form.branch.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label" for="{{ form.year.id_for_label }}">Year</label>
+                            {{ form.year }}
+                            {% if form.year.errors %}
+                            <div class="invalid-feedback d-block">{{ form.year.errors|join:", " }}</div>
+                            {% endif %}
+                            <small class="text-muted">1-8</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone & Hosteller Row -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label" for="{{ form.phone.id_for_label }}">Phone Number</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                            <div class="invalid-feedback d-block">{{ form.phone.errors|join:", " }}</div>
+                            {% endif %}
+                            <small class="text-muted">Optional, for contact purposes</small>
+                        </div>
+                        <div class="col-md-6 mb-4 d-flex align-items-end">
+                            <div class="form-check">
+                                {{ form.is_hosteller }}
+                                <label class="form-check-label" for="{{ form.is_hosteller.id_for_label }}">
+                                    I am a hosteller
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mt-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem; vertical-align: -2px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

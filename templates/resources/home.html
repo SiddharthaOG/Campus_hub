@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load resource_filters %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-white mb-5 rounded-3">
+    <div class="container py-5 position-relative">
+        <h1 class="display-4 fw-bold mb-3">Campus Resource Hub</h1>
+        <p class="lead mb-4" style="max-width: 600px;">Find and share academic resources with your campus community. Notes, past papers, study materials — all in one place.</p>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'resources:resource_list' %}" class="btn btn-light btn-lg px-4">Browse Resources</a>
+            <a href="{% url 'resources:add_resource' %}" class="btn btn-outline-light btn-lg px-4">Add Resource</a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-5">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-number" data-target="{{ total_resources }}">0</div>
+            <div class="stat-label">Total Resources</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-number" data-target="{{ total_subjects }}">0</div>
+            <div class="stat-label">Subjects Covered</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-number" data-target="100">0</div>
+            <div class="stat-label">Free to Access</div>
+        </div>
+    </div>
+</div>
+
+<!-- Search -->
+<div class="row justify-content-center mb-5">
+    <div class="col-md-8">
+        <h3 class="mb-3 fw-semibold">Search the Library</h3>
+        <form action="{% url 'resources:resource_list' %}" method="GET" class="input-group">
+            <input type="text" name="search" class="form-control form-control-lg" placeholder="Search notes, subjects, tags..." aria-label="Search resources">
+            <button class="btn btn-primary btn-lg px-4" type="submit">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                Search
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Recently Added -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-semibold mb-0">Recently Added</h3>
+    <a href="{% url 'resources:resource_list' %}" class="btn btn-sm btn-outline-secondary">View All</a>
+</div>
+
+<div class="row g-4">
+    {% for res in recent_resources %}
+    <div class="col-md-4">
+        <div class="card resource-card h-100">
+            <div class="card-body">
+                <span class="badge bg-{{ res.resource_type|slugify }} mb-2">{{ res.resource_type }}</span>
+                <h5 class="card-title">{{ res.title|truncatechars:45 }}</h5>
+                <div class="resource-meta">
+                    <span>{{ res.subject }}</span>
+                    <span>Sem {{ res.semester }}</span>
+                </div>
+                <p class="card-text">{{ res.description|truncatechars:100 }}</p>
+            </div>
+            <div class="resource-footer">
+                <small class="text-muted">{{ res.created_at|date:"M d, Y" }}</small>
+                <div class="d-flex gap-2 align-items-center">
+                    <form action="{% url 'resources:upvote_resource' res.pk %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-upvote" title="Upvote" hx-post="{% url 'resources:upvote_resource' res.pk %}" hx-target="closest .btn-upvote" hx-swap="outerHTML">
+                            👍 {{ res.upvotes }}
+                        </button>
+                    </form>
+                    <a href="{% url 'resources:resource_detail' res.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="empty-state">
+            <div class="icon">
+                <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+            </div>
+            <h4>No resources yet</h4>
+            <p class="mb-3">Be the first to contribute to the campus library!</p>
+            <a href="{% url 'resources:add_resource' %}" class="btn btn-primary">Add First Resource</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    // Animated counter for stats
+    document.addEventListener('DOMContentLoaded', function() {
+        const counters = document.querySelectorAll('.stat-number[data-target]');
+        const speed = 200; // Lower = faster
+
+        const animateCounter = (counter) => {
+            const target = +counter.getAttribute('data-target');
+            const count = +counter.innerText;
+            const increment = target / speed;
+
+            if (count < target) {
+                counter.innerText = Math.ceil(count + increment);
+                setTimeout(() => animateCounter(counter), 1);
+            } else {
+                counter.innerText = target;
+            }
+        };
+
+        // Intersection Observer to trigger animation when visible
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('counting');
+                    animateCounter(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        counters.forEach(counter => observer.observe(counter));
+    });
+</script>
+{% endblock %}
