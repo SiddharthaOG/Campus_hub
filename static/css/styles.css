@@ -700,3 +700,75 @@ footer {
         font-size: 1.5rem;
     }
 }
+ /* === PREMIUM MICRO-INTERACTIONS === */
+
+/* 1. Smooth Scrolling for the whole page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 2. Make buttons feel tactile (push down when clicked) */
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+  transition: transform 0.05s ease;
+}
+
+/* 3. Better hover state for Resource Cards */
+.resource-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.resource-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: var(--primary);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s ease;
+}
+
+.resource-card:hover::after {
+  transform: scaleY(1);
+}
+
+/* 4. Hover effect for Nav Links (underline expand) */
+.navbar-nav .nav-link {
+  position: relative;
+}
+.navbar-nav .nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  display: block;
+  margin-top: 4px;
+  right: 0;
+  background: var(--primary);
+  transition: width 0.3s ease;
+  -webkit-transition: width 0.3s ease;
+}
+.navbar-nav .nav-link:hover::after {
+  width: 100%;
+  left: 0;
+  background: var(--primary);
+}
+
+/* 5. Better focus ring for inputs (Accessibility + Style) */
+.form-control:focus, .form-select:focus {
+  box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+/* 6. Better blockquote/comment styling */
+.comment-card {
+  border-left: 3px solid var(--primary);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.comment-card:hover {
+  transform: translateX(4px);
+  background-color: var(--card-bg);
+}

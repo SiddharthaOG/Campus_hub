@@ -51,30 +51,54 @@
                 {% endif %}
 
                 <!-- File Preview Section -->
-                {% if resource.file %}
+                {% if resource.file or resource.external_url %}
                 <div class="mb-4">
                     <h5 class="fw-semibold mb-3">Preview</h5>
-                    {% with file_url=resource.file.url file_name=resource.file.name %}
-                        {% if file_name|lower|endswith:".jpg" or file_name|lower|endswith:".jpeg" or file_name|lower|endswith:".png" or file_name|lower|endswith:".gif" or file_name|lower|endswith:".webp" %}
-                            <div class="text-center mb-3">
-                                <img src="{{ file_url }}" alt="{{ file_name }}" class="img-fluid rounded shadow-sm" style="max-height: 500px;">
-                            </div>
-                        {% elif file_name|lower|endswith:".pdf" %}
-                            <div class="ratio ratio-16x9 rounded overflow-hidden border">
-                                <iframe src="{{ file_url }}" class="border-0" title="{{ file_name }}"></iframe>
-                            </div>
-                            <div class="text-center mt-2">
-                                <small class="text-muted">If the PDF doesn't display, <a href="{{ file_url }}" target="_blank">open in new tab</a></small>
-                            </div>
-                        {% else %}
-                            <div class="alert alert-info">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2" style="vertical-align: -2px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                Preview not available for this file type. <a href="{{ file_url }}" class="alert-link">Download to view</a>.
-                            </div>
-                        {% endif %}
-                    {% endwith %}
+                    {% if resource.file %}
+                        {% with file_url=resource.file.url file_name=resource.file.name %}
+                            {% if file_name|lower|endswith:".jpg" or file_name|lower|endswith:".jpeg" or file_name|lower|endswith:".png" or file_name|lower|endswith:".gif" or file_name|lower|endswith:".webp" %}
+                                <div class="text-center mb-3">
+                                    <img src="{{ file_url }}" alt="{{ file_name }}" class="img-fluid rounded shadow-sm" style="max-height: 500px;">
+                                </div>
+                            {% elif file_name|lower|endswith:".pdf" %}
+                                <div class="ratio ratio-16x9 rounded overflow-hidden border">
+                                    <iframe src="{{ file_url }}" class="border-0" title="{{ file_name }}"></iframe>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">If the PDF doesn't display, <a href="{{ file_url }}" target="_blank">open in new tab</a></small>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2" style="vertical-align: -2px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Preview not available for this file type. <a href="{{ file_url }}" class="alert-link">Download to view</a>.
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    {% elif resource.external_url %}
+                        {% with ext_url=resource.external_url %}
+                            {% if ext_url|lower|endswith:".pdf" %}
+                                <div class="ratio ratio-16x9 rounded overflow-hidden border">
+                                    <iframe src="{{ ext_url }}" class="border-0" title="External PDF"></iframe>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">If the PDF doesn't display, <a href="{{ ext_url }}" target="_blank">open in new tab</a></small>
+                                </div>
+                            {% elif ext_url|lower|endswith:".jpg" or ext_url|lower|endswith:".jpeg" or ext_url|lower|endswith:".png" %}
+                                <div class="text-center mb-3">
+                                    <img src="{{ ext_url }}" alt="External Image" class="img-fluid rounded shadow-sm" style="max-height: 500px;">
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2" style="vertical-align: -2px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Preview not available for this link type. <a href="{{ ext_url }}" target="_blank" class="alert-link">Open in new tab</a>.
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
                 </div>
                 {% endif %}
 
@@ -97,16 +121,14 @@
                             </svg>
                             Download File
                         </a>
-                    {% endif %}
-                    {% if resource.external_url %}
-                        <a href="{% url 'resources:download_resource' resource.pk %}?action=external" class="btn btn-primary btn-lg px-4" target="_blank" rel="noopener">
+                    {% elif resource.external_url %}
+                        <a href="{{ resource.external_url }}" class="btn btn-primary btn-lg px-4" target="_blank" rel="noopener">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem; vertical-align: -2px;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                             </svg>
                             Open External Link
                         </a>
-                    {% endif %}
-                    {% if not resource.file and not resource.external_url %}
+                    {% else %}
                         <div class="alert alert-danger mb-0 d-flex align-items-center">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="me-2" style="flex-shrink: 0;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
