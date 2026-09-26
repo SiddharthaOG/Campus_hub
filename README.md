@@ -1,47 +1,64 @@
-# Campus Resource Hub
+<div align="center">
+  
+# 🎓 Campus Resource Hub
 
 A modern Django-based platform for students to share and discover academic resources (notes, previous year papers, lab manuals, study materials) with social features like upvotes, comments, and user following.
 
-![Django](https://img.shields.io/badge/Django-4.2-green)
-![Python](https://img.shields.io/badge/Python-3.11+-blue)
-![Tests](https://img.shields.io/badge/Tests-36_passing-brightgreen)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-336791)
+![Django](https://img.shields.io/badge/Django-4.2-092E20?style=for-the-badge&logo=django&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-36_Passing-brightgreen?style=for-the-badge&logo=github-actions&logoColor=white)
+![HTMX](https://img.shields.io/badge/HTMX-Dynamic_UX-336791?style=for-the-badge&logo=htmx&logoColor=white)
 
-## Features
+### 🚀 Live Demo (MVP)
 
-### Core Functionality
+The application is deployed and running live on Render as an MVP. 
+
+*(Note: As this uses Render's free tier, the server may take up to 60 seconds to "wake up" if it has been inactive.)*
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://campus-hub-23pe.onrender.com/)
+
+**Link:** https://campus-hub-23pe.onrender.com/
+
+</div>
+
+---
+
+### 🧑‍💻 About the Project
+This project was built as a technical screening challenge to demonstrate clean architecture, modular Django design, and modern full-stack development practices. It uses a traditional Django server-rendered approach supercharged with HTMX for dynamic UX, without the overhead of a React/Vue SPA.
+
+---
+
+### ✨ Features
+
+#### Core Functionality
 - **Resource Library**: Browse, search, and filter academic resources by subject, semester, branch, and type
 - **File Previews**: Inline PDF viewer and image previews for uploaded files
 - **External Links**: Support for Google Drive, GitHub, and other external resource links
 - **Download Tracking**: Automatic download counting
 
-### Social Features
+#### Social Features
 - **Upvotes**: Reddit-style upvoting on resources with real-time updates (HTMX)
 - **Comments**: Threaded comments with auto-filled username for logged-in users
 - **User Profiles**: Public profiles showing uploaded resources, bio, branch, year, hosteller status
 - **Follow System**: Follow/unfollow users, mutual followers detection
 - **Career Upvotes**: Aggregate upvote count across all user's resources
 
-### Admin & Management
+#### Admin & Management
 - **Supercharged Admin**: Featured resources toggle, branch/semester/type filters, date hierarchy, bulk actions
 - **Resource Ownership**: Track who uploaded each resource
 - **File Storage**: Local development, Supabase/PostgreSQL ready, Cloudinary/AWS S3 configurable
 
-### Modern Stack
-- **Django 4.2** with class-based patterns
-- **HTMX** for dynamic interactions without heavy JS frameworks
-- **Bootstrap 5** with custom CSS variables for theming
-- **PostgreSQL** (Supabase) with SQLite fallback for local dev
-- **36 automated tests** covering models, views, auth, and social features
+---
 
-## Quick Start
+### 🚀 Quick Start
 
-### Prerequisites
+#### Prerequisites
 - Python 3.11+
 - PostgreSQL (or use SQLite for local dev)
 - Git
 
-### Installation
+#### Installation
 
 ```bash
 # Clone the repository
@@ -78,7 +95,9 @@ python manage.py runserver
 
 Visit `http://127.0.0.1:8000/` to see the app.
 
-## Configuration
+---
+
+### ⚙️ Configuration
 
 Create a `.env` file in the project root:
 
@@ -105,81 +124,9 @@ AWS_STORAGE_BUCKET_NAME=your_bucket
 AWS_S3_REGION_NAME=us-east-1
 ```
 
-### Production Settings
-Set these in your production environment:
-```env
-DEBUG=False
-SECRET_KEY=<generate with: python -c "import secrets; print(secrets.token_urlsafe(50))">
-ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
-DATABASE_URL=postgresql://...
-```
+---
 
-Security settings (HSTS, SSL redirect, secure cookies) activate automatically when `DEBUG=False`.
-
-## Project Structure
-
-```
-Campus-Hub/
-├── campus_hub/           # Project settings
-│   ├── settings.py       # Main configuration
-│   ├── urls.py           # Root URL routing
-│   └── wsgi.py
-├── resources/            # Main app
-│   ├── models.py         # Resource, Comment models
-│   ├── views.py          # Resource CRUD, search, upvotes, comments
-│   ├── forms.py          # ResourceForm, CommentForm, SignUpForm
-│   ├── urls.py           # Resource URLs
-│   ├── admin.py          # Supercharged admin config
-│   ├── templatetags/     # Custom template filters
-│   ├── partials/         # HTMX partial templates
-│   ├── tests.py          # 19 tests
-│   └── migrations/
-├── users/                # User profiles & social
-│   ├── models.py         # Profile, Follow models
-│   ├── views.py          # Profile, follow, edit views
-│   ├── forms.py          # ProfileForm
-│   ├── urls.py           # User URLs
-│   ├── tests.py          # 17 tests
-│   └── migrations/
-├── templates/
-│   ├── base.html         # Base template with navbar
-│   ├── resources/        # Resource templates
-│   │   ├── home.html
-│   │   ├── resource_list.html
-│   │   ├── resource_detail.html
-│   │   ├── add_resource.html
-│   │   └── partials/     # HTMX partials
-│   ├── users/            # User templates
-│   │   ├── profile.html
-│   │   └── edit_profile.html
-│   └── registration/     # Auth templates
-├── static/css/styles.css # Custom styles (CSS variables)
-├── media/                # Uploaded files (gitignored)
-├── seed_data.py          # Sample resource data
-├── seed_files.py         # Sample file uploads
-├── requirements.txt
-├── Dockerfile
-├── docker-compose.yml
-└── manage.py
-```
-
-## Key URLs
-
-| Path | Description |
-|------|-------------|
-| `/` | Home page with stats & recent resources |
-| `/resources/` | Resource library with search/filter |
-| `/resources/add/` | Add new resource (login required) |
-| `/resources/<pk>/` | Resource detail with preview, comments, upvotes |
-| `/resources/<pk>/download/` | Download file or open external link |
-| `/resources/<pk>/upvote/` | Upvote resource (HTMX) |
-| `/resources/<pk>/comment/` | Add comment (login required) |
-| `/users/<username>/` | Public user profile |
-| `/users/<username>/follow/` | Follow/unfollow user |
-| `/users/edit/` | Edit own profile |
-| `/admin/` | Django admin panel |
-
-## Testing
+### 🧪 Testing
 
 ```bash
 # Run all tests (36 tests)
@@ -188,23 +135,19 @@ python manage.py test
 # Run specific app tests
 python manage.py test resources
 python manage.py test users
-
-# With coverage
-pip install coverage
-coverage run --source='.' manage.py test
-coverage report
 ```
-
 **Current coverage**: 36 tests passing (19 resources + 17 users)
 
-## Deployment
+---
 
-### Docker
+### 🐳 Deployment
+
+#### Docker
 ```bash
 docker-compose up --build
 ```
 
-### Manual (Production)
+#### Manual (Production)
 ```bash
 # On server
 export DEBUG=False
@@ -219,43 +162,44 @@ python manage.py collectstatic --noinput
 gunicorn campus_hub.wsgi:application --bind 0.0.0.0:8000
 ```
 
-### Supabase (PostgreSQL)
-1. Create Supabase project
-2. Get connection string from Settings → Database
-3. Add to `.env` as `DATABASE_URL`
-4. Run `python manage.py migrate`
+---
 
-## Tech Stack
+### 🗺️ Key URLs
 
-| Layer | Technology |
-|-------|------------|
-| Backend | Django 4.2 |
-| Database | PostgreSQL (Supabase) / SQLite (dev) |
-| Frontend | Bootstrap 5, HTMX, Vanilla JS |
-| File Storage | Local / Cloudinary / AWS S3 |
-| Containerization | Docker, Docker Compose |
-| Testing | Django TestCase, Client |
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Django community for the excellent framework
-- HTMX for enabling dynamic UX without SPA complexity
-- Supabase for managed PostgreSQL
-- Bootstrap for responsive UI components
+| Path | Description |
+|------|-------------|
+| `/` | Home page with stats & recent resources |
+| `/resources/` | Resource library with search/filter |
+| `/resources/add/` | Add new resource (login required) |
+| `/resources/<pk>/` | Resource detail with preview, comments, upvotes |
+| `/resources/<pk>/download/` | Download file or open external link |
+| `/resources/<pk>/upvote/` | Upvote resource (HTMX) |
+| `/users/<username>/` | Public user profile |
+| `/users/<username>/follow/` | Follow/unfollow user |
+| `/admin/` | Django admin panel |
 
 ---
 
+### 🏗️ Project Structure
+
+```text
+Campus-Hub/
+├── campus_hub/           # Project settings
+├── resources/            # Main app (CRUD, search, upvotes, comments)
+├── users/                # User profiles & social (Follow, Profile)
+├── templates/            # Django Templates (Bootstrap 5 + HTMX)
+├── static/css/styles.css # Custom dark-mode CSS variables
+├── seed_data.py          # Sample resource data
+├── Dockerfile            # Containerization
+├── docker-compose.yml    # Local Docker Dev Environment
+└── manage.py
+```
+
+---
+
+<div align="center">
+  
 **Built with ❤️ for students, by students**
 **MADE BY SIDDHARTHA TRIPATHY**
+
+</div>
